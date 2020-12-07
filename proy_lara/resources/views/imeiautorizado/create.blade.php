@@ -6,7 +6,7 @@
 </style>
 <div class="card uper">
 	<div class="card-header">
-		Imei autorizado
+		Votos
 	</div>
 	<div class="card-body">
 		@if ($errors->any())
@@ -20,9 +20,6 @@
 		@endif
 		<form method="post" action="{{ route('imeiautorizado.store') }} " enctype="multipart/form-data">
 			{{ csrf_field() }}
-
-			
-
 
 			<div class="form-group">
 				@csrf
@@ -46,7 +43,7 @@
 
 			<div class="form-group">
 				@csrf
-				<label for="casilla">Casila:</label>
+				<label for="casilla">Casilla:</label>
 				<select name="casilla_id">
 					@foreach ($casillas as $casilla)
 						<option value="{{ $casilla->id}}">{{ $casilla->ubicacion}}</option>
@@ -56,7 +53,7 @@
 
 			<div class="form-group">
 				@csrf
-				<label for="imei">Imei:</label>
+				<label for="imei">imei:</label>
 				<input type="text" class="form-control" name="imei"/>
 			</div>
 			

@@ -97,10 +97,10 @@ class ImeiautorizadoController extends Controller
         $funcionarios = Funcionario::all();
         $casillas = Casilla::all();
         $elecciones = Eleccion::all();
-        $imeiautorizados = Imeiautorizado::find($id);
+        $imeiautorizado = Imeiautorizado::find($id);
 
         return view("imeiautorizado/edit", 
-        compact("imeiautorizados", "funcionarios","casillas", "elecciones"));
+        compact("imeiautorizado", "funcionarios","casillas", "elecciones"));
     }
 
     /**

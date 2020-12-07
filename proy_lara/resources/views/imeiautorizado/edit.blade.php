@@ -6,7 +6,7 @@
 </style>
 <div class="card uper">
 	<div class="card-header">
-		Editar imei autorizado
+		Editar Imei
 	</div>
 	<div class="card-body">
 		@if ($errors->any())
@@ -22,16 +22,17 @@
 			@method('PUT')
 			{{ csrf_field() }}
 
-			
-
 			<div class="form-group">
 				@csrf
 				<label for="funcionario">Funcionario:</label>
 				<select name="funcionario_id">
-					@foreach ($funcionarios as $funcionario)
-						<option value="{{ $funcionario->id}}">{{ $funcionario->nombrecompleto}}</option>
-					@endforeach
-				</select>
+                    @foreach ($funcionarios as $funcionario)
+                        @php
+                            $selected = ($imeiautorizado->funcionario_id==$funcionario->id)?" selected ":"";
+                        @endphp
+                        <option value="{{ $funcionario->id }}" {{$selected}}>{{ $funcionario->nombrecompleto }}</option>
+                    @endforeach
+                </select>
 			</div>
 
 			<div class="form-group">
@@ -40,7 +41,7 @@
 				<select name="eleccion_id">
                     @foreach ($elecciones as $eleccion)
                         @php
-                            $selected = ($imei->eleccion_id==$eleccion->id)?" selected ":"";
+                            $selected = ($imeiautorizado->eleccion_id==$eleccion->id)?" selected ":"";
                         @endphp
                         <option value="{{ $eleccion->id }}" {{ $selected }}>{{ $eleccion->periodo }}</option>
                     @endforeach
@@ -53,7 +54,7 @@
 				<select name="casilla_id">
                     @foreach ($casillas as $casilla)
                         @php
-                            $selected = ($imei->casilla_id==$casilla->id)?" selected ":"";
+                            $selected = ($imeiautorizado->casilla_id==$casilla->id)?" selected ":"";
                         @endphp
                         <option value="{{ $casilla->id }}" {{$selected}}>{{ $casilla->ubicacion }}</option>
                     @endforeach
@@ -63,7 +64,7 @@
 			<div class="form-group">
 				@csrf
 				<label for="imei">Imei:</label>
-				<input type="text" value="{{$imei->imei}}" 
+				<input type="text" value="{{$imeiautorizado->imei}}" 
 				class="form-control"
 				name="imei"/>
 			</div>

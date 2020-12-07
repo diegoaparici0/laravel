@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Models\Candidato;
 use App\Models\Eleccion;
 use App\Models\Casilla;
 use App\Models\Voto;
@@ -60,15 +61,29 @@ class VotoController extends Controller
 
         
         $data = [
-            "casilla_id" => $request->casilla_id ,
             "eleccion_id" => $request->eleccion_id,
+            "casilla_id" => $request->casilla_id ,
             "evidencia" => $request->evidencia
 
         ];
         
-        Voto::create($data);
-        return redirect('voto')->with('success',
-            ' guardado satisfactoriamente ...');
+        //Voto::create($data);
+       // return redirect('voto')->with('success',
+           // ' guardado satisfactoriamente ...');
+
+        $candidatos= array_filter(
+            $_POST,
+            function($f){
+                return(substr($f,0,9)="candidato");
+
+            },  ARRAY_FILTER_USE_KEY
+        );
+
+        foreach ($candidato as $key => $value) {
+            $candidato_id = intval(substr($key,10));
+            echo "Candidato_id: $candidato";
+            # code...
+        }
     }
 
     /**

@@ -27,10 +27,10 @@
 		
 			<tr>
 				<td>{{$imeiautorizado->id}}</td>
-				<td>{{$imei->funcionario}}</td>
-				<td>{{$imei->eleccion}}</td>
-				<td>{{$imei->casilla}}</td>
-				<td>{{$imei->imei}}</td>
+				<td>{{$imeiautorizado->funcionario}}</td>
+				<td>{{$imeiautorizado->eleccion}}</td>
+				<td>{{$imeiautorizado->casilla}}</td>
+				<td>{{$imeiautorizado->imei}}</td>
 
 				<td><a href="{{ route('imeiautorizado.edit', $imeiautorizado->id)}}"
 					class="btn btn-primary">Edit</a></td>
@@ -41,7 +41,7 @@
 						@csrf
 						@method('DELETE')
 						<button class="btn btn-danger" type="submit"
-						onclick="return confirm('Esta seguro de borrar el imei {{$imei->eleccion}} con la casilla {{$imei->casilla}')" >Del</button>
+						onclick="return confirm('Esta seguro de borrar al Funcionario {{$imeiautorizado->funcionario}} con el imei {{$imeiautorizado->imei}}')" >Del</button>
 					</form>
 				</td>
 			</tr>
