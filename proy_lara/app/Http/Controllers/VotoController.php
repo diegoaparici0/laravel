@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Models\Candidato;
 use App\Models\Eleccion;
 use App\Models\Casilla;
+use App\Models\Votocandidato;
 use App\Models\Voto;
-
+use Barryvdh\DomPDF\Facade as PDF; //--- Se agregó esta línea
 use Illuminate\Support\Facades\DB;
 
 class VotoController extends Controller
@@ -20,14 +20,13 @@ class VotoController extends Controller
      */
     public function index()
     {
-        $votos = DB::table('voto')
-            ->join('eleccion', 'voto.eleccion_id', '=', 'eleccion.id')
-            ->join('casilla', 'voto.casilla_id', '=', 'casilla.id')
-            ->select('voto.id', 'eleccion.periodo as eleccion', 'casilla.ubicacion as casilla', 'evidencia')
-            ->get();
+        $sql = "SELECT v.id, e.periodo as eleccion, c.ubicacion as casilla, v.evidencia 
+            FROM voto v 
+            INNER JOIN eleccion e ON v.eleccion_id=e.id 
+            INNER JOIN casilla c ON v.casilla_id=c.id";
 
-        return view("voto/list",
-        compact("votos"));
+        $votos = DB::select($sql);
+        return view("voto/list", compact("votos")); 
     }
 
     /**
@@ -37,11 +36,13 @@ class VotoController extends Controller
      */
     public function create()
     {
-        $elecciones = Eleccion::all();
-        $casillas = Casilla::all();
 
-        return view("voto/create", 
-        compact("elecciones","casillas"));
+        $casillas   = Casilla::all();
+        $candidatos = Candidato::all();
+        $elecciones = Eleccion::all();
+        return view("voto/create",
+        compact("casillas","candidatos","elecciones"));
+    
 
     }
 
@@ -51,39 +52,47 @@ class VotoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+   public function store(Request $request)
     {
+
+        //print_r($_POST); exit;
+        $evidencia = "";
         $request->validate([
-            'casilla_id' => 'required|integer',
-            'eleccion_id'=>'required|integer',
-            'evidencia' => 'required|max:200'
+            'eleccion_id' => 'required',
+            'casilla_id'=>'required',
+            'evidencia'=>'required|mimes:pdf|max:8192'
         ]);
+        if ($request->hasFile('evidencia')) {
+            $evidencia = $request->evidencia->getClientOriginalName() ;
+            $request->evidencia->move(public_path('uploads'), $evidencia);
 
-        
-        $data = [
-            "eleccion_id" => $request->eleccion_id,
-            "casilla_id" => $request->casilla_id ,
-            "evidencia" => $request->evidencia
-
-        ];
-        
-        //Voto::create($data);
-       // return redirect('voto')->with('success',
-           // ' guardado satisfactoriamente ...');
-
-        $candidatos= array_filter(
-            $_POST,
-            function($f){
-                return(substr($f,0,9)="candidato");
-
-            },  ARRAY_FILTER_USE_KEY
-        );
-
-        foreach ($candidato as $key => $value) {
-            $candidato_id = intval(substr($key,10));
-            echo "Candidato_id: $candidato";
-            # code...
         }
+        $data = ["eleccion_id"=>$request->eleccion_id,
+                "casilla_id"=>$request->casilla_id,
+                "evidencia"=>$evidencia
+            ];
+        //--- inserta en voto
+        $voto = Voto::create($data);
+        $id = $voto->id;
+        //--- insertar en votoscandidatos
+        $candidatos = array_filter(
+            $_POST,
+            function ($f)  {
+                return ( substr($f,0,9)=="candidato");
+            },
+            ARRAY_FILTER_USE_KEY
+        );
+        foreach ($candidatos as $key => $value) { 
+            $candidato_id = intval(substr($key, 10));
+            $datavotocandidato = ["voto_id" =>intval($id),
+                   "candidato_id" => $candidato_id,
+                   "votos" => intval($value)
+                ];
+            Votocandidato::create($datavotocandidato);
+        }
+        return redirect('voto')->with('success',
+            ' guardado satisfactoriamente ...');
+        //echo "Guardado satisfactoriamente ...";
     }
 
     /**
@@ -105,12 +114,12 @@ class VotoController extends Controller
      */
     public function edit($id)
     {
+
         $elecciones = Eleccion::all();
         $casillas = Casilla::all();
         $voto = Voto::find($id);
-
-        return view("voto/edit", 
-        compact("voto","elecciones","casillas"));
+        
+        return view('voto/edit',compact("voto","elecciones","casillas"));
     }
 
     /**
@@ -122,23 +131,26 @@ class VotoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
+       $request->validate([
             'casilla_id'=>'required|integer',
             'eleccion_id'=>'required|integer',
-            'evidencia' => 'required|max:200'
-
+            'evidencia'=>'required'
         ]);
-        
+
+        if($request->hasFile('evidencia')){
+           $evidencia = $request->evidencia->getClientOriginalName();
+           $request->evidencia->move(public_path('uploads'), $evidencia);
+        }
+
         $data = [
             "casilla_id" => $request->casilla_id ,
             "eleccion_id" => $request->eleccion_id,
-            "evidencia" => $request->evidencia
+            "evidencia"=> $evidencia
         ];
-        
-        Voto::find($id)->update($data);
-        return redirect('voto')->with('success',
-            ' Cambio realizado ...');
 
+        Voto::whereId($id)->update($data);
+        return redirect('voto')
+        ->with('success', 'Actualizado correctamente...');
     }
 
     /**
@@ -149,7 +161,20 @@ class VotoController extends Controller
      */
     public function destroy($id)
     {
-        Voto::find($id)->delete();
+        $voto = Voto::find($id);
+        $voto->delete();
         return redirect('voto');
+    }
+
+    public function generatepdf()
+    {
+        $sql = "SELECT v.id, e.periodo as eleccion, c.ubicacion as casilla, v.evidencia 
+            FROM voto v 
+            INNER JOIN eleccion e ON v.eleccion_id=e.id 
+            INNER JOIN casilla c ON v.casilla_id=c.id";
+
+        $votos = DB::select($sql);
+        $pdf = PDF::loadView('voto/vistapdf', ['votos'=>$votos]);
+        return $pdf->stream('voto.pdf');
     }
 }
