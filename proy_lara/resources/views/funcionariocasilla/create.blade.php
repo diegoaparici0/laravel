@@ -6,7 +6,7 @@
 </style>
 <div class="card uper">
 	<div class="card-header">
-		Funcionario y Casillas
+		FuncionarioCasilla
 	</div>
 	<div class="card-body">
 		@if ($errors->any())
@@ -33,7 +33,7 @@
 
 			<div class="form-group">
 				@csrf
-				<label for="casilla">Casila:</label>
+				<label for="casilla">Casilla:</label>
 				<select name="casilla_id">
 					@foreach ($casillas as $casilla)
 						<option value="{{ $casilla->id}}">{{ $casilla->ubicacion}}</option>

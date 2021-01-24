@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Candidato;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class CandidatoController extends Controller
 {
@@ -40,10 +41,10 @@ class CandidatoController extends Controller
         $perfil ="";
 
         $request->validate([
-        'nombrecompleto' => 'required|max:200',
-        'sexo' => 'required|max:1',
-        'foto' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        'perfil' => 'required',
+            'nombrecompleto' => 'required|max:200',
+            'sexo' => 'required|max:1',
+            'foto' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'perfil' => 'required',
         ]);
 
         if ($request->hasFile('foto')){
@@ -104,10 +105,10 @@ class CandidatoController extends Controller
         $perfil ="";
 
         $request->validate([
-        'nombrecompleto' => 'required|max:200',
-        'sexo' => 'required|max:1',
-        'foto' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        'perfil' => 'required',
+            'nombrecompleto' => 'required|max:200',
+            'sexo' => 'required|max:1',
+            'foto' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'perfil' => 'required',
         ]);
 
         if($request->hasFile('foto')){
@@ -142,5 +143,23 @@ class CandidatoController extends Controller
     {
         Candidato::find($id)->delete();
         return redirect('candidato');
+    }
+
+    public function generatepdf()
+    {
+
+        $candidatos = Candidato::all();
+        $pdf = PDF::loadView('candidato/list', ['candidatos'=>$candidatos]);
+        return $pdf->download('archivocandidato.pdf');
+
+        /*$html = "<div style='text-align:center;'><h1>PDF generado desde etiquetas html</h1>
+        <br><h3>&copy;DIEGOAPARICIO.dev</h3> </div>";
+        $pdf = PDF::loadHTML($html);
+        return $pdf->download('archivo.pdf');*/
+
+        /*$candidatos = Candidato::all();
+        return PDF::loadView('candidato/list', ['candidatos'=>$candidatos])
+            ->stream('archivocandidato.pdf');*/
+
     }
 }

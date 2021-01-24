@@ -11,7 +11,7 @@
         {{ session()->get('success') }}
     </div><br />
     @endif
-    <table class="table table-striped">
+    <table class="table table-striped table-hover">
     <thead>
         <tr>
 			<th>ID</th>
@@ -31,7 +31,7 @@
 				<td>{{$candidato->sexo}}</td>
 				<td><a href="uploads/{{$candidato->perfil}}"> 
 					<img src="uploads/icon-pdf.png" alt ="pdf" width="100" height ="100">  </a> 
-				</td>
+			</td>
 				<td><a href="{{ route('candidato.edit', $candidato->id)}}"
 					class="btn btn-primary">Editar</a></td>
 				<td>

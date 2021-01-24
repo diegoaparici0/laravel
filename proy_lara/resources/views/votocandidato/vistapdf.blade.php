@@ -3,7 +3,7 @@
 <head>
 	<div style='text-align:center;'>	
    
-		<h1>PDF CON NUMERO DE PAGINA:</h1>
+		<h1>PDF CON PAGINA:</h1>
 		<br>
 </head>
    

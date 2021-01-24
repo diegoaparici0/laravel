@@ -113,16 +113,16 @@ class VotocandidatoController extends Controller
 
         /*$votocandidatos = DB::select($sql);
         $pdf = PDF::loadView('votocandidato/vista', ['votocandidatos'=>$votocandidatos]);
-        return $pdf->stream('archivovotocandidato.pdf');*/
+        return $pdf->stream('archivocandidato.pdf');*/
 
         /*$votocandidatos = DB::select($sql);
         $pdf = PDF::loadView('votocandidato/list', ['votocandidatos'=>$votocandidatos]);
-        return $pdf->download('archivovotocandidato.pdf');*/
+        return $pdf->download('archivovcandidato.pdf');*/
 
         $html = "<div style='text-align:center;'><h1>PDF generado desde etiquetas html</h1>
         <br><h3>&copy;DIEGOAPARICIO.dev</h3> </div>";
         $pdf = PDF::loadHTML($html);
-        return $pdf->download('archivovotocandidato.pdf');
+        return $pdf->download('archivocandidato.pdf');
     }
 
     public function generatechart()

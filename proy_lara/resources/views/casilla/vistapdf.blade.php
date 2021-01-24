@@ -3,7 +3,7 @@
 <head>
 	<div style='text-align:center;'>	
    
-		<h1>PDF CON SALTO DE PAGINA</h1><br>
+		<h1>PDF CON PAGINA</h1><br>
 </head>
    
    </div>

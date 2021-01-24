@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Funcionario;
+
+use Barryvdh\DomPDF\Facade as PDF;
+
 class FuncionarioController extends Controller
 {
     /**
@@ -14,7 +17,7 @@ class FuncionarioController extends Controller
     public function index()
     {
         $funcionarios = Funcionario::all();
-        return view("/funcionario/list", compact('funcionarios'));
+			return view("/funcionario/list", compact('funcionarios'));
     }
 
     /**
@@ -35,7 +38,7 @@ class FuncionarioController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+       $request->validate([
          'nombrecompleto' => 'required|max:100',
          'sexo' => 'required|max:1'
         ]);
@@ -46,7 +49,7 @@ class FuncionarioController extends Controller
 
         $funcionario = Funcionario::create($data);
         return redirect('funcionario')
-        ->with('success', $funcionario->nombrecompleto . 'Agregafdo correctamente...');
+        ->with('success', $funcionario->nombrecompleto . 'Agregado correctamente...');
     }
 
     /**
@@ -68,7 +71,7 @@ class FuncionarioController extends Controller
      */
     public function edit($id)
     {
-        $funcionario = Funcionario::find($id);
+         $funcionario = Funcionario::find($id);
         return view("funcionario/edit", compact('funcionario'));
     }
 
@@ -81,7 +84,7 @@ class FuncionarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
+         $request->validate([
          'nombrecompleto' => 'required|max:100',
          'sexo' => 'required|max:1'
         ]);
@@ -105,5 +108,22 @@ class FuncionarioController extends Controller
     {
         Funcionario::whereId($id)->delete();
         return redirect('funcionario');
+    }
+
+    public function generatepdf()
+    {
+
+        /*$funcionarios = Funcionario::all();
+        $pdf = PDF::loadView('funcionario/list', ['funcionarios'=>$funcionarios]);
+        return $pdf->download('archivofun.pdf');*/
+        
+        /*$html = "<div style='text-align:center;'><h1>PDF generado desde etiquetas html</h1>
+        <br><h3>&copy;DIEGOAPARICIO.dev</h3> </div>";
+        $pdf = PDF::loadHTML($html);
+        return $pdf->download('archivofun.pdf');*/
+
+        $funcionarios = Funcionario::all();
+        return PDF::loadView('funcionario/list', ['funcionarios'=>$funcionarios])
+            ->stream('archivofun.pdf');
     }
 }
